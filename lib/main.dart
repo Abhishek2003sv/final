@@ -1,26 +1,44 @@
 // Main entry point for the Flutter application
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/firebase_services.dart';
 import 'package:my_flutter_app/prediction_page.dart';
 import 'weather_service.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:my_flutter_app/firebase_services.dart';
-void main() {
-  runApp(LandslideApp());
+import 'firebase_options.dart';
+// void main() {
+//   runApp(LandslideApp());
   
-  Container(
-  color: Colors.cyan, // Sets the background color
-  padding: const EdgeInsets.all(16.0),
-   // Adds padding inside the container
-);
+//   Container(
+//   color: Colors.cyan, // Sets the background color
+//   padding: const EdgeInsets.all(16.0),
+//    // Adds padding inside the container
+// );
+///}
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp();
+//   runApp(LandslideApp());
+// }
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: "AIzaSyDI-iQiRatwDaMEnsJj6ku5kvUuEIM9ULw",
+      appId: "1:248824650721:web:9965e6125459f1f6c450a0",
+      messagingSenderId: "248824650721",
+      projectId: "myflutterapp-f60b3",
+      databaseURL: "https://myflutterapp-f60b3-default-rtdb.firebaseio.com",
+    ),
+  );
   runApp(LandslideApp());
 }
-}
+
 
 // void main() async {
 //   Container(
@@ -481,92 +499,50 @@ class ResourceRequestsPage extends StatelessWidget {
 // FeedbackPage class (Move it outside of HomePage)
 }
 
-class FeedbackPage extends StatelessWidget {
+
+
+class FeedbackPage extends StatefulWidget {
+  @override
+  _FeedbackPageState createState() => _FeedbackPageState();
+}
+class _FeedbackPageState extends State<FeedbackPage> {
+  final FirebaseServices firebaseServices = FirebaseServices();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController messageController = TextEditingController();
-  final firebaseServices = FirebaseServices();
+  final TextEditingController feedbackController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Contact Us'),
-      ),
+      appBar: AppBar(title: Text('Feedbacks'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'We value your feedback!',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Your Name',
-              ),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Your Email',
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: messageController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Your Feedback/Message',
-              ),
-              maxLines: 5,
-            ),
-            SizedBox(height: 20),
+            TextField(controller: nameController, decoration: InputDecoration(labelText: 'Your Name')),
+            SizedBox(height: 8),
+            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Your Email')),
+            SizedBox(height: 8),
+            TextField(controller: feedbackController, decoration: InputDecoration(labelText: 'Your Feedback'), maxLines: 3),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
                 final name = nameController.text.trim();
                 final email = emailController.text.trim();
-                final message = messageController.text.trim();
+                final feedback = feedbackController.text.trim();
 
-                if (name.isEmpty || email.isEmpty || message.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please fill out all fields.')),
-                  );
-                } else if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(email)) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Please enter a valid email address.')),
-                  );
+                if (name.isEmpty || email.isEmpty || feedback.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill out all fields.')));
                 } else {
-                  try {
-                    await firebaseServices.addFeedback(name, email, message);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Thank you for your feedback!')),
-                    );
-
-                    // Clear the fields after submission
-                    nameController.clear();
-                    emailController.clear();
-                    messageController.clear();
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error: $e')),
-                    );
-                  }
+                  await firebaseServices.addFeedback(name, email, feedback);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Thank you for your feedback!')));
+                  nameController.clear();
+                  emailController.clear();
+                  feedbackController.clear();
                 }
               },
               child: Text('Submit'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.all(16),
-                textStyle: TextStyle(fontSize: 18),
-              ),
             ),
           ],
         ),

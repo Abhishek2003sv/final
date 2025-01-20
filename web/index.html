@@ -1,19 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
@@ -34,5 +21,32 @@
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDI-iQiRatwDaMEnsJj6ku5kvUuEIM9ULw",
+      authDomain: "myflutterapp-f60b3.firebaseapp.com",
+      projectId: "myflutterapp-f60b3",
+      storageBucket: "myflutterapp-f60b3.firebasestorage.app",
+      messagingSenderId: "248824650721",
+      appId: "1:248824650721:web:9965e6125459f1f6c450a0",
+      measurementId: "G-ZCRD9VFZQV"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    
+    // Initialize Firebase Analytics
+    const analytics = firebase.analytics(app);
+
+    // Example for initializing Firebase Realtime Database
+    const database = firebase.database(app);
+  </script>
 </body>
 </html>

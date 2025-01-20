@@ -1,24 +1,30 @@
 library default_connector;
-
-// ignore: depend_on_referenced_packages
 import 'package:firebase_data_connect/firebase_data_connect.dart';
+import 'dart:convert';
+
+
+
+
+
+
 
 class DefaultConnector {
-  static final ConnectorConfig connectorConfig = ConnectorConfig(
-    'asia-south1', // Firebase region
-    'firebase_data_connect', // Connector name
-    'backend-ab512', // Firebase project ID
+  
+
+  static ConnectorConfig connectorConfig = ConnectorConfig(
+    'us-central1',
+    'default',
+    'project',
   );
 
-  static final DefaultConnector _instance = DefaultConnector._internal();
+  DefaultConnector({required this.dataConnect});
+  static DefaultConnector get instance {
+    return DefaultConnector(
+        dataConnect: FirebaseDataConnect.instanceFor(
+            connectorConfig: connectorConfig,
+            sdkType: CallerSDKType.generated));
+  }
 
-  factory DefaultConnector() => _instance;
-
-  DefaultConnector._internal()
-      : dataConnect = FirebaseDataConnect.instanceFor(
-          connectorConfig: connectorConfig,
-          sdkType: CallerSDKType.generated,
-        );
-
-  final FirebaseDataConnect dataConnect;
+  FirebaseDataConnect dataConnect;
 }
+

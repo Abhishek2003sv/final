@@ -1,5 +1,5 @@
 specVersion: "v1beta"
-serviceId: "my_flutter_app"
+serviceId: "project"
 location: "us-central1"
 schema:
   source: "./schema"
@@ -7,6 +7,6 @@ schema:
     postgresql:
       database: "fdcdb"
       cloudSql:
-        instanceId: "my_flutter_app-fdc"
+        instanceId: "project-fdc"
       # schemaValidation: "COMPATIBLE"
 connectorDirs: ["./connector"]
