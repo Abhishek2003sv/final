@@ -243,47 +243,77 @@ class GuidancePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Guidance'),
+        title: Text(
+          'Guidance',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color.fromARGB(255, 99, 206, 248),
+        elevation: 4,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
+          physics: BouncingScrollPhysics(),
           children: [
-            ExpansionTile(
-              title: Text('Step 1: Stay Informed'),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Monitor weather reports and warnings from authorities.',
-                  ),
-                ),
-              ],
+            AnimatedTile(
+              title: 'Step 1: Stay Informed',
+              description: 'Landslides often occur due to heavy rainfall, earthquakes, or human activities. Staying informed can help you anticipate risks.\n\nHow?\n- Monitor weather reports and warnings from government agencies.\n- Follow local disaster management authorities and news updates.\n- Use mobile alerts or apps that provide real-time weather and landslide risk notifications.',
             ),
-            ExpansionTile(
-              title: Text('Step 2: Prepare Emergency Kit'),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Include essentials such as water, food, flashlight, and medicines.',
-                  ),
-                ),
-              ],
+            AnimatedTile(
+              title: 'Step 2: Prepare an Emergency Kit',
+              description: 'In case of a landslide, roads may be blocked, power may be cut off, and essential services may be delayed.\n\nWhat to Include?\n- Water: At least three days’ supply for each person.\n- Food: Non-perishable items like canned food, energy bars, and dry fruits.\n- Flashlight & Batteries: For visibility in case of power outages.\n- First Aid Kit: Bandages, antiseptics, necessary medications.\n- Important Documents: IDs, insurance papers, emergency contacts, and maps.\n- Clothing & Blanket: To stay warm and dry.',
             ),
-            ExpansionTile(
-              title: Text('Step 3: Plan Evacuation'),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Identify safe areas and routes in advance.',
-                  ),
-                ),
-              ],
+            AnimatedTile(
+              title: 'Step 3: Plan Evacuation',
+              description: 'Knowing escape routes and safe zones can save lives during an emergency.\n\nHow?\n- Identify and mark safe areas (higher ground away from slopes).\n- Plan multiple escape routes in case roads are blocked.\n- Discuss the evacuation plan with family or community members.\n- Keep emergency contacts ready and inform loved ones about your plans.',
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class AnimatedTile extends StatelessWidget {
+  final String title;
+  final String description;
+
+  const AnimatedTile({
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      elevation: 4,
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        backgroundColor: Colors.teal.shade50,
+        collapsedBackgroundColor: Colors.white,
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: const Color.fromARGB(255, 134, 202, 241),
+          ),
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Text(
+              description,
+              style: TextStyle(
+                fontSize: 16,
+                color: const Color.fromARGB(255, 89, 191, 250),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -499,52 +529,146 @@ class ResourceRequestsPage extends StatelessWidget {
 // FeedbackPage class (Move it outside of HomePage)
 }
 
-
-
 class FeedbackPage extends StatefulWidget {
   @override
   _FeedbackPageState createState() => _FeedbackPageState();
 }
-class _FeedbackPageState extends State<FeedbackPage> {
+
+class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderStateMixin {
   final FirebaseServices firebaseServices = FirebaseServices();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController feedbackController = TextEditingController();
 
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 800),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeIn,
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    nameController.dispose();
+    emailController.dispose();
+    feedbackController.dispose();
+    super.dispose();
+  }
+
+  bool isValidEmail(String email) {
+    return email.contains('@') && email.contains('.');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Feedbacks'), centerTitle: true),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(controller: nameController, decoration: InputDecoration(labelText: 'Your Name')),
-            SizedBox(height: 8),
-            TextField(controller: emailController, decoration: InputDecoration(labelText: 'Your Email')),
-            SizedBox(height: 8),
-            TextField(controller: feedbackController, decoration: InputDecoration(labelText: 'Your Feedback'), maxLines: 3),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () async {
-                final name = nameController.text.trim();
-                final email = emailController.text.trim();
-                final feedback = feedbackController.text.trim();
+      appBar: AppBar(
+        title: Text('Feedback'),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+        elevation: 4.0,
+      ),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'We value your feedback!',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Your Name',
+                  prefixIcon: Icon(Icons.person, color: Colors.blueAccent),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: 'Your Email',
+                  prefixIcon: Icon(Icons.email, color: Colors.blueAccent),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+                keyboardType: TextInputType.emailAddress,
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: feedbackController,
+                decoration: InputDecoration(
+                  labelText: 'Your Feedback',
+                  prefixIcon: Icon(Icons.feedback, color: Colors.blueAccent),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+                maxLines: 3,
+              ),
+              SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () async {
+                  final name = nameController.text.trim();
+                  final email = emailController.text.trim();
+                  final feedback = feedbackController.text.trim();
 
-                if (name.isEmpty || email.isEmpty || feedback.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please fill out all fields.')));
-                } else {
-                  await firebaseServices.addFeedback(name, email, feedback);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Thank you for your feedback!')));
-                  nameController.clear();
-                  emailController.clear();
-                  feedbackController.clear();
-                }
-              },
-              child: Text('Submit'),
-            ),
-          ],
+                  if (name.isEmpty || email.isEmpty || feedback.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Please fill out all fields.')),
+                    );
+                  } else if (!isValidEmail(email)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Please enter a valid email address.')),
+                    );
+                  } else {
+                    await firebaseServices.addFeedback(name, email, feedback);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Thank you for your feedback!')),
+                    );
+                    nameController.clear();
+                    emailController.clear();
+                    feedbackController.clear();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
+                child: Text(
+                  'Submit Feedback',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

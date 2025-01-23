@@ -1,0 +1,1 @@
+ build/web/manifest.json build/web/favicon.png:  /home/abhishek/development/project/web/manifest.json /home/abhishek/development/project/web/index.html /home/abhishek/development/project/web/favicon.png

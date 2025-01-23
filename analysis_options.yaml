@@ -3,6 +3,7 @@ analyzer:
     unused_local_variable: ignore
     unused_element: ignore
     depend_on_referenced_packages: ignore
+    empty_statements: ignore
 include: package:flutter_lints/flutter.yaml
 
 linter:
