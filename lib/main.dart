@@ -1,27 +1,19 @@
-// Main entry point for the Flutter application
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/firebase_services.dart';
 import 'package:my_flutter_app/prediction_page.dart';
 import 'weather_service.dart';
-import 'package:video_player/video_player.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-// void main() {
-//   runApp(LandslideApp());
-  
-//   Container(
-//   color: Colors.cyan, // Sets the background color
-//   padding: const EdgeInsets.all(16.0),
-//    // Adds padding inside the container
-// );
-///}
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp();
-//   runApp(LandslideApp());
-// }
+import 'package:url_launcher/url_launcher.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_animate/flutter_animate.dart'; // Package for animations
 
 
 
@@ -38,18 +30,6 @@ void main() async {
   );
   runApp(LandslideApp());
 }
-
-
-// void main() async {
-//   Container(
-//   color: Colors.cyan, // Sets the background color
-//   padding: const EdgeInsets.all(16.0), // Adds padding inside the container
-//   );
-//   WidgetsFlutterBinding.ensureInitialized(); // Ensures Flutter is ready to initialize Firebase
-//   await Firebase.initializeApp(); // Initializes Firebase
-//   runApp(LandslideApp());
-// }
-
 class LandslideApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -57,186 +37,105 @@ class LandslideApp extends StatelessWidget {
       title: 'Landslide Prediction App',
       theme: ThemeData(
         primarySwatch: Colors.green,
+        fontFamily: 'Roboto',
       ),
       home: HomePage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-
-class _HomePageState extends State<HomePage> {
-  late VideoPlayerController _controller;
-
-@override
-void initState() {
-  super.initState();
-  _controller = VideoPlayerController.asset('assets/0_Earth_Planet_3840x2160.mp4')
-    ..initialize().then((_) {
-      setState(() {
-        _controller
-          ..play()
-          ..setLooping(true)
-          ..setVolume(0.0);
-        print("Video initialized successfully!");
-      });
-    }).catchError((error) {
-      print("Error initializing video: $error");
-    });
-}
-
-
-@override
-Future<void> dispose() async {
-    _controller.dispose();
-    super.dispose();
-}
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: Stack(
-      children: [
-        // Video background
-        if (_controller.value.isInitialized)
-          SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: _controller.value.size.width,
-                height: _controller.value.size.height,
-                child: VideoPlayer(_controller),
-              ),
-            ),
-          )
-        else
-          Center(
-            child: CircularProgressIndicator(), // Loading indicator
-          ),
-
-        // Dark overlay
-        Container(
-          // ignore: deprecated_member_use
-          color: const Color.fromARGB(255, 39, 176, 255).withOpacity(0.5), // Adjust opacity for better visibility
-        ),
-
-        // Overlay content
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 60),
-              Center(
-                child: Text(
-                  'Welcome to the Landslide Prediction App',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 34,
-                        color: Colors.white, // Visible on dark overlay
-                      ),
-                ),
-              ),
-              SizedBox(height: 40),
-              _buildButton(context, 'Landslide Prediction', Icons.warning, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => PredictionPage()));
-              }),
-              _buildButton(context, 'Guidance', Icons.help, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => GuidancePage()));
-              }),
-              _buildButton(context, 'Weather Forecasting', Icons.cloud, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherForecastingPage()));
-              }),
-              _buildButton(context, 'Emergency Alerts', Icons.notifications, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => EmergencyAlertsPage()));
-              }),
-              _buildButton(context, 'Resource Requests', Icons.support, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ResourceRequestsPage()));
-              }),
-              _buildButton(context, 'Contact Us', Icons.feedback, () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => FeedbackPage()));
-              }),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-}
-
-Widget _buildButton(BuildContext context, String label, IconData icon, VoidCallback onPressed) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 20),
-    child: ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        iconColor: const Color.fromARGB(255, 16, 131, 189),
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        padding: EdgeInsets.all(20),
-        textStyle: TextStyle(fontSize: 20),
-        shadowColor: Color.fromARGB(100, 163, 32, 9),
-      ),
-    ),
-  );
-}
-
-
-class PredictionPage extends StatelessWidget {
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Landslide Prediction'),
+      body: Stack(
+        children: [
+          // Gradient background
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 58, 223, 201),
+                  Color.fromARGB(255, 124, 204, 224),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+
+          // Content overlay
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 100),
+                Center(
+                  child: Text(
+                    'Welcome to the Landslide Prediction App',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                
+                // Buttons
+                _buildButton(context, 'Landslide Prediction', Icons.warning, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => PredictionPage()));
+                }),
+                _buildButton(context, 'Guidance', Icons.help, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => GuidancePage()));
+                }),
+                _buildButton(context, 'Weather Forecasting', Icons.cloud, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherForecastingPage()));
+                }),
+                _buildButton(context, 'Emergency Alerts', Icons.notifications, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => EmergencyAlertsPage()));
+                }),
+                _buildButton(context, 'Resource Requests', Icons.support, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ResourceRequestsPage()));
+                }),
+                _buildButton(context, 'Contact Us', Icons.feedback, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => FeedbackPage()));
+                }),
+              ],
+            ),
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Enter Details for Prediction',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Location',
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Handle prediction logic
-              },
-              child: Text('Predict'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.all(16),
-                textStyle: TextStyle(fontSize: 18),
-              ),
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: Text(
-                'Prediction Results will appear here.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            ),
-          ],
+    );
+  }
+
+  Widget _buildButton(BuildContext context, String label, IconData icon, VoidCallback onPressed) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 30),
+        label: Text(
+          label,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          backgroundColor: Colors.white,
+          foregroundColor: Color.fromARGB(255, 0, 131, 176),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          shadowColor: Colors.black26,
         ),
       ),
     );
   }
 }
+
 
 class GuidancePage extends StatelessWidget {
   @override
@@ -247,7 +146,7 @@ class GuidancePage extends StatelessWidget {
           'Guidance',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color.fromARGB(255, 99, 206, 248),
+        backgroundColor: const Color.fromARGB(255, 128, 231, 226),
         elevation: 4,
       ),
       body: Padding(
@@ -360,7 +259,7 @@ class _WeatherForecastingPageState extends State<WeatherForecastingPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Weather Forecasting'),
-        backgroundColor: Colors.lightBlue,  // You can set your primary blue color here.
+        backgroundColor: const Color.fromARGB(255, 144, 233, 233),  // You can set your primary blue color here.
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -486,48 +385,6 @@ class EmergencyAlertsPage extends StatelessWidget {
   }
 }
 
-class ResourceRequestsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Resource Requests'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Request Resources',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Your Need',
-              ),
-              maxLines: 3,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Handle resource request submission
-              },
-              child: Text('Submit Request'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.all(16),
-                textStyle: TextStyle(fontSize: 18),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-// FeedbackPage class (Move it outside of HomePage)
-}
 
 class FeedbackPage extends StatefulWidget {
   @override
@@ -576,7 +433,7 @@ class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderSt
       appBar: AppBar(
         title: Text('Feedback'),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: const Color.fromARGB(255, 149, 226, 220),
         elevation: 4.0,
       ),
       body: FadeTransition(
@@ -591,7 +448,7 @@ class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderSt
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
+                  color: const Color.fromARGB(255, 120, 216, 219),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -600,7 +457,7 @@ class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderSt
                 controller: nameController,
                 decoration: InputDecoration(
                   labelText: 'Your Name',
-                  prefixIcon: Icon(Icons.person, color: Colors.blueAccent),
+                  prefixIcon: Icon(Icons.person, color: const Color.fromARGB(255, 121, 225, 233)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
@@ -611,7 +468,7 @@ class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderSt
                 controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Your Email',
-                  prefixIcon: Icon(Icons.email, color: Colors.blueAccent),
+                  prefixIcon: Icon(Icons.email, color: const Color.fromARGB(255, 140, 214, 236)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
@@ -623,7 +480,7 @@ class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderSt
                 controller: feedbackController,
                 decoration: InputDecoration(
                   labelText: 'Your Feedback',
-                  prefixIcon: Icon(Icons.feedback, color: Colors.blueAccent),
+                  prefixIcon: Icon(Icons.feedback, color: const Color.fromARGB(255, 136, 199, 228)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
@@ -656,7 +513,7 @@ class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderSt
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: const Color.fromARGB(255, 127, 218, 210),
                   padding: EdgeInsets.symmetric(vertical: 16.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),
@@ -670,6 +527,113 @@ class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderSt
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+
+class ResourceRequestsPage extends StatelessWidget {
+  final TextEditingController _requestController = TextEditingController();
+
+  final String recipientPhoneNumber = '+916235887925'; // Recipient phone number with country code
+
+  void _sendWhatsAppMessage(BuildContext context, String requestDetails) async {
+    final url = Uri.parse('https://wa.me/$recipientPhoneNumber?text=${Uri.encodeComponent(requestDetails)}');
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open WhatsApp. Please ensure it is installed.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: AppBar(
+          title: Text('Resource Requests'),
+          centerTitle: true,
+          backgroundColor: Colors.teal,
+          elevation: 10,
+          shadowColor: Colors.tealAccent,
+        ).animate().fadeIn(duration: 1.seconds).slideY(), // Animation applied
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Request Resources via WhatsApp',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.teal,
+              ),
+            ).animate().fadeIn(duration: 1.seconds).slideX(),
+            SizedBox(height: 20),
+            TextField(
+              controller: _requestController,
+              decoration: InputDecoration(
+                labelText: 'Enter Your Request',
+                labelStyle: TextStyle(fontSize: 18, color: Colors.teal),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.teal, width: 2),
+                ),
+                prefixIcon: Icon(Icons.edit, color: Colors.teal),
+              ),
+              maxLines: 5,
+            ).animate().fadeIn(duration: 1.seconds).slideY(delay: 300.ms),
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  String requestDetails = _requestController.text.trim();
+
+                  if (requestDetails.isNotEmpty) {
+                    _sendWhatsAppMessage(context, requestDetails);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Please enter the request details.')),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 8,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.send),
+                    SizedBox(width: 10),
+                    Text(
+                      'Send via WhatsApp',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(duration: 1.seconds).scale(),
+            ),
+            SizedBox(height: 30),
+            Image.asset(
+              'assets/images/whatsapp_banner.png', // Add a creative image here
+              height: 200,
+            ).animate().fadeIn(duration: 1.5.seconds).slideY(delay: 500.ms),
+          ],
+        ).animate().fadeIn(duration: 1.seconds),
       ),
     );
   }

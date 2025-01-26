@@ -20,7 +20,9 @@ dependencies:
   cloud_firestore: ^5.4.0  # Or another version as needed
   firebase_database: ^11.3.0
   email_validator: ^3.0.0
-  url_launcher: ^6.1.9
+  url_launcher: ^6.0.0
+  mailer: ^6.4.1
+  flutter_animate: ^4.0.3
 
 dev_dependencies:
   flutter_test:

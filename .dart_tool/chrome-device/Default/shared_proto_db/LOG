@@ -1,7 +1,14 @@
-2025/01/23-12:31:44.864 4180 Reusing MANIFEST /tmp/flutter_tools.OXVDCY/flutter_tools_chrome_device.WFDLPA/Default/shared_proto_db/MANIFEST-000001
-2025/01/23-12:31:44.864 4180 Recovering log #13
-2025/01/23-12:31:44.865 4180 Reusing old log /tmp/flutter_tools.OXVDCY/flutter_tools_chrome_device.WFDLPA/Default/shared_proto_db/000013.log 
-2025/01/23-12:31:44.865 4180 Delete type=0 #3
-2025/01/23-12:31:44.865 4180 Delete type=0 #4
-2025/01/23-12:31:44.865 4180 Delete type=0 #10
-2025/01/23-12:31:44.865 4180 Delete type=0 #7
+2025/01/26-19:59:08.614 a9f Reusing MANIFEST /tmp/flutter_tools.NEZVXC/flutter_tools_chrome_device.HZVRNT/Default/shared_proto_db/MANIFEST-000001
+2025/01/26-19:59:08.614 a9f Recovering log #23
+2025/01/26-19:59:08.614 a9f Reusing old log /tmp/flutter_tools.NEZVXC/flutter_tools_chrome_device.HZVRNT/Default/shared_proto_db/000023.log 
+2025/01/26-19:59:08.614 a9f Delete type=2 #14
+2025/01/26-19:59:08.614 a9f Delete type=2 #11
+2025/01/26-19:59:08.614 a9f Delete type=0 #16
+2025/01/26-19:59:08.614 a9f Delete type=0 #3
+2025/01/26-19:59:08.614 a9f Delete type=2 #8
+2025/01/26-19:59:08.614 a9f Delete type=0 #19
+2025/01/26-19:59:08.614 a9f Delete type=0 #13
+2025/01/26-19:59:08.614 a9f Delete type=0 #4
+2025/01/26-19:59:08.614 a9f Delete type=0 #10
+2025/01/26-19:59:08.614 a9f Delete type=2 #17
+2025/01/26-19:59:08.614 a9f Delete type=0 #7
