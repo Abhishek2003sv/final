@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
+// import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:my_flutter_app/firebase_services.dart';
 import 'package:my_flutter_app/prediction_page.dart';
@@ -12,9 +13,13 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_animate/flutter_animate.dart'; // Package for animations
 
+import 'package:geolocator/geolocator.dart';
+import 'home_page.dart';
+import 'login_page.dart';
 
 
 void main() async {
@@ -34,16 +39,30 @@ class LandslideApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Landslide Prediction App',
       theme: ThemeData(
         primarySwatch: Colors.green,
         fontFamily: 'Roboto',
       ),
-      home: HomePage(),
+      home: AuthWrapper(),
     );
   }
 }
-
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          return snapshot.hasData ? HomePage() : LoginPage();
+        }
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+}
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -136,7 +155,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-
 class GuidancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -144,27 +162,30 @@ class GuidancePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Guidance',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
         ),
-        backgroundColor: const Color.fromARGB(255, 128, 231, 226),
-        elevation: 4,
+        backgroundColor: const Color.fromARGB(255, 94, 190, 238),
+        elevation: 2,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           physics: BouncingScrollPhysics(),
           children: [
-            AnimatedTile(
+            ClassicTile(
               title: 'Step 1: Stay Informed',
-              description: 'Landslides often occur due to heavy rainfall, earthquakes, or human activities. Staying informed can help you anticipate risks.\n\nHow?\n- Monitor weather reports and warnings from government agencies.\n- Follow local disaster management authorities and news updates.\n- Use mobile alerts or apps that provide real-time weather and landslide risk notifications.',
+              description:
+                  'Landslides often occur due to heavy rainfall, earthquakes, or human activities. Staying informed can help you anticipate risks.\n\nHow?\n- Monitor weather reports and warnings from government agencies.\n- Follow local disaster management authorities and news updates.\n- Use mobile alerts or apps that provide real-time weather and landslide risk notifications.',
             ),
-            AnimatedTile(
+            ClassicTile(
               title: 'Step 2: Prepare an Emergency Kit',
-              description: 'In case of a landslide, roads may be blocked, power may be cut off, and essential services may be delayed.\n\nWhat to Include?\n- Water: At least three days’ supply for each person.\n- Food: Non-perishable items like canned food, energy bars, and dry fruits.\n- Flashlight & Batteries: For visibility in case of power outages.\n- First Aid Kit: Bandages, antiseptics, necessary medications.\n- Important Documents: IDs, insurance papers, emergency contacts, and maps.\n- Clothing & Blanket: To stay warm and dry.',
+              description:
+                  'In case of a landslide, roads may be blocked, power may be cut off, and essential services may be delayed.\n\nWhat to Include?\n- Water: At least three days’ supply for each person.\n- Food: Non-perishable items like canned food, energy bars, and dry fruits.\n- Flashlight & Batteries: For visibility in case of power outages.\n- First Aid Kit: Bandages, antiseptics, necessary medications.\n- Important Documents: IDs, insurance papers, emergency contacts, and maps.\n- Clothing & Blanket: To stay warm and dry.',
             ),
-            AnimatedTile(
+            ClassicTile(
               title: 'Step 3: Plan Evacuation',
-              description: 'Knowing escape routes and safe zones can save lives during an emergency.\n\nHow?\n- Identify and mark safe areas (higher ground away from slopes).\n- Plan multiple escape routes in case roads are blocked.\n- Discuss the evacuation plan with family or community members.\n- Keep emergency contacts ready and inform loved ones about your plans.',
+              description:
+                  'Knowing escape routes and safe zones can save lives during an emergency.\n\nHow?\n- Identify and mark safe areas (higher ground away from slopes).\n- Plan multiple escape routes in case roads are blocked.\n- Discuss the evacuation plan with family or community members.\n- Keep emergency contacts ready and inform loved ones about your plans.',
             ),
           ],
         ),
@@ -173,11 +194,11 @@ class GuidancePage extends StatelessWidget {
   }
 }
 
-class AnimatedTile extends StatelessWidget {
+class ClassicTile extends StatelessWidget {
   final String title;
   final String description;
 
-  const AnimatedTile({
+  const ClassicTile({
     required this.title,
     required this.description,
   });
@@ -186,29 +207,31 @@ class AnimatedTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
       ),
-      elevation: 4,
+      elevation: 1,
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: ExpansionTile(
-        tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        backgroundColor: Colors.teal.shade50,
+        tilePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        backgroundColor: Colors.grey.shade100,
         collapsedBackgroundColor: Colors.white,
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: const Color.fromARGB(255, 134, 202, 241),
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: const Color.fromARGB(255, 112, 195, 233),
           ),
         ),
         children: [
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(16.0),
             child: Text(
               description,
               style: TextStyle(
-                fontSize: 16,
-                color: const Color.fromARGB(255, 89, 191, 250),
+                fontSize: 15,
+                height: 1.5,
+                color: Colors.grey.shade800,
               ),
             ),
           ),
@@ -533,14 +556,68 @@ class _FeedbackPageState extends State<FeedbackPage> with SingleTickerProviderSt
 }
 
 
+class ResourceRequestsPage extends StatefulWidget {
+  @override
+  _ResourceRequestsPageState createState() => _ResourceRequestsPageState();
+}
 
-class ResourceRequestsPage extends StatelessWidget {
+class _ResourceRequestsPageState extends State<ResourceRequestsPage> {
   final TextEditingController _requestController = TextEditingController();
+  final String recipientPhoneNumber = '+917736253719';
+  final DatabaseReference _database = FirebaseDatabase.instance.ref("resource_requests");
+  Position? _currentPosition;
 
-  final String recipientPhoneNumber = '+916235887925'; // Recipient phone number with country code
+  @override
+  void initState() {
+    super.initState();
+    _updateUserLocation();
+  }
 
-  void _sendWhatsAppMessage(BuildContext context, String requestDetails) async {
-    final url = Uri.parse('https://wa.me/$recipientPhoneNumber?text=${Uri.encodeComponent(requestDetails)}');
+  /// ✅ Get and store user's location
+  Future<void> _updateUserLocation() async {
+    try {
+      Position position = await _getCurrentLocation();
+      setState(() {
+        _currentPosition = position;
+      });
+    } catch (e) {
+      print("Location error: $e");
+    }
+  }
+
+  /// ✅ Get current location using Geolocator
+  Future<Position> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permission denied');
+      }
+    }
+    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  }
+
+  /// ✅ Store request in Firebase and send WhatsApp message
+  Future<void> _sendWhatsAppMessage(BuildContext context, String requestDetails) async {
+    if (_currentPosition == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location not available. Please try again.')),
+      );
+      return;
+    }
+
+    // ✅ Store request in Firebase
+    String requestId = _database.push().key ?? "request_${DateTime.now().millisecondsSinceEpoch}";
+    await _database.child(requestId).set({
+      'request': requestDetails,
+      'latitude': _currentPosition!.latitude,
+      'longitude': _currentPosition!.longitude,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
+    // ✅ Prepare WhatsApp message with location
+    String locationMessage = "\nLocation: https://www.google.com/maps/search/?api=1&query=${_currentPosition!.latitude},${_currentPosition!.longitude}";
+    final url = Uri.parse('https://wa.me/$recipientPhoneNumber?text=${Uri.encodeComponent(requestDetails + locationMessage)}');
 
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -554,15 +631,14 @@ class ResourceRequestsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
-        child: AppBar(
-          title: Text('Resource Requests'),
-          centerTitle: true,
-          backgroundColor: Colors.teal,
-          elevation: 10,
-          shadowColor: Colors.tealAccent,
-        ).animate().fadeIn(duration: 1.seconds).slideY(), // Animation applied
+      appBar: AppBar(
+        title: Text('Resource Requests')
+            .animate()
+            .flip(duration: 1.seconds), // Animation only on text
+        centerTitle: true,
+        backgroundColor: Colors.teal,
+        elevation: 10,
+        shadowColor: Colors.tealAccent,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -576,7 +652,7 @@ class ResourceRequestsPage extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: Colors.teal,
               ),
-            ).animate().fadeIn(duration: 1.seconds).slideX(),
+            ).animate().scale(duration: 1.seconds, curve: Curves.easeOutBack),
             SizedBox(height: 20),
             TextField(
               controller: _requestController,
@@ -591,13 +667,12 @@ class ResourceRequestsPage extends StatelessWidget {
                 prefixIcon: Icon(Icons.edit, color: Colors.teal),
               ),
               maxLines: 5,
-            ).animate().fadeIn(duration: 1.seconds).slideY(delay: 300.ms),
+            ).animate().flip(duration: 1.seconds, delay: 300.ms),
             SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   String requestDetails = _requestController.text.trim();
-
                   if (requestDetails.isNotEmpty) {
                     _sendWhatsAppMessage(context, requestDetails);
                   } else {
@@ -619,21 +694,13 @@ class ResourceRequestsPage extends StatelessWidget {
                   children: [
                     Icon(Icons.send),
                     SizedBox(width: 10),
-                    Text(
-                      'Send via WhatsApp',
-                      style: TextStyle(fontSize: 16),
-                    ),
+                    Text('Send Request', style: TextStyle(fontSize: 16)),
                   ],
                 ),
-              ).animate().fadeIn(duration: 1.seconds).scale(),
+              ).animate().scale(duration: 1.seconds, curve: Curves.elasticOut),
             ),
-            SizedBox(height: 30),
-            Image.asset(
-              'assets/images/whatsapp_banner.png', // Add a creative image here
-              height: 200,
-            ).animate().fadeIn(duration: 1.5.seconds).slideY(delay: 500.ms),
           ],
-        ).animate().fadeIn(duration: 1.seconds),
+        ).animate().scale(duration: 1.seconds),
       ),
     );
   }

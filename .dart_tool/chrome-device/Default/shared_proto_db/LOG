@@ -1,14 +1,9 @@
-2025/01/26-19:59:08.614 a9f Reusing MANIFEST /tmp/flutter_tools.NEZVXC/flutter_tools_chrome_device.HZVRNT/Default/shared_proto_db/MANIFEST-000001
-2025/01/26-19:59:08.614 a9f Recovering log #23
-2025/01/26-19:59:08.614 a9f Reusing old log /tmp/flutter_tools.NEZVXC/flutter_tools_chrome_device.HZVRNT/Default/shared_proto_db/000023.log 
-2025/01/26-19:59:08.614 a9f Delete type=2 #14
-2025/01/26-19:59:08.614 a9f Delete type=2 #11
-2025/01/26-19:59:08.614 a9f Delete type=0 #16
-2025/01/26-19:59:08.614 a9f Delete type=0 #3
-2025/01/26-19:59:08.614 a9f Delete type=2 #8
-2025/01/26-19:59:08.614 a9f Delete type=0 #19
-2025/01/26-19:59:08.614 a9f Delete type=0 #13
-2025/01/26-19:59:08.614 a9f Delete type=0 #4
-2025/01/26-19:59:08.614 a9f Delete type=0 #10
-2025/01/26-19:59:08.614 a9f Delete type=2 #17
-2025/01/26-19:59:08.614 a9f Delete type=0 #7
+2025/02/28-02:44:46.214 3f57 Reusing MANIFEST /tmp/flutter_tools.SXHNGW/flutter_tools_chrome_device.WSMTVJ/Default/shared_proto_db/MANIFEST-000001
+2025/02/28-02:44:46.214 3f57 Recovering log #10
+2025/02/28-02:44:46.215 3f57 Reusing old log /tmp/flutter_tools.SXHNGW/flutter_tools_chrome_device.WSMTVJ/Default/shared_proto_db/000010.log 
+2025/02/28-02:44:46.215 3f57 Delete type=0 #3
+2025/02/28-02:44:46.215 3f57 Delete type=0 #4
+2025/02/28-02:44:46.215 3f57 Delete type=0 #7
+2025/02/28-02:44:56.509 3f63 Level-0 table #14: started
+2025/02/28-02:44:56.514 3f63 Level-0 table #14: 125141 bytes OK
+2025/02/28-02:44:56.516 3f63 Delete type=0 #10

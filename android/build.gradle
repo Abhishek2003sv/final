@@ -1,6 +1,43 @@
+plugins {
+    id 'com.android.application'  // Plugin for Android application
+    id 'com.google.gms.google-services'  // Plugin for Google Services (for Firebase)
+}
+
+android {
+    compileSdkVersion 34  // Updated to compile with SDK 34
+    
+    defaultConfig {
+        applicationId "com.android.application"  // Your application ID (replace this with your actual package name)
+        minSdkVersion 21
+        targetSdkVersion 34  // Target SDK version 34 for compatibility with Firebase
+        versionCode 1
+        versionName "1.0"
+    }
+
+    // Namespace declaration for Android 12+ projects
+    namespace 'com.android.application'  // Replace this with your actual package name
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    // Firebase dependencies using BOM (Bill of Materials)
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
+    implementation 'com.google.firebase:firebase-analytics'  // Firebase Analytics
+    // Add other Firebase dependencies here if needed
+
+    // Additional dependencies (example)
+    implementation 'com.android.support:appcompat-v7:28.0.0'  // Example dependency, remove if not needed
+}
+
 allprojects {
     repositories {
-        google()
+        google()  // Repositories for Android SDK and Firebase
         mavenCentral()
     }
 }
@@ -8,43 +45,5 @@ allprojects {
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
     project.evaluationDependsOn(":app")
-}
-
-tasks.register("clean", Delete) {
-    delete rootProject.buildDir
-}
-plugins {
-
-  id 'com.android.application'
-
-  // Add the Google services Gradle plugin
-
-  id 'com.google.gms.google-services'
-
-  ...
-
-}
-
-
-dependencies {
-
-  // Import the Firebase BoM
-
-  implementation platform('com.google.firebase:firebase-bom:33.7.0')
-
-
-  // TODO: Add the dependencies for Firebase products you want to use
-
-  // When using the BoM, don't specify versions in Firebase dependencies
-
-  implementation 'com.google.firebase:firebase-analytics'
-
-
-  // Add the dependencies for any other desired Firebase products
-
-  // https://firebase.google.com/docs/android/setup#available-libraries
-
 }

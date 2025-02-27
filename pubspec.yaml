@@ -13,7 +13,7 @@ dependencies:
   chewie: ^1.4.2
   video_player: ^2.5.1
   english_words: ^4.0.0
-  provider: ^6.0.0
+  provider: ^6.1.2
   geolocator: ^13.0.2
   firebase_core: ^3.10.0  # Ensure this is compatible with your other packages
   firebase_analytics: ^11.4.0  # Updated to a compatible version
@@ -23,6 +23,9 @@ dependencies:
   url_launcher: ^6.0.0
   mailer: ^6.4.1
   flutter_animate: ^4.0.3
+  firebase_auth: ^5.5.1
+  google_sign_in: ^6.2.1
+  marquee: ^2.2.3
 
 dev_dependencies:
   flutter_test:
