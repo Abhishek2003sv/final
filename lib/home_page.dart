@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:marquee/marquee.dart';
-import 'package:my_flutter_app/prediction_page.dart';
+import 'package:firebase_auth/firebase_auth.dart'; 
+import 'login_page.dart';  // Import your login page
+import 'main.dart';
+import 'prediction_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final List<String> newsList = [
     "Stay alert during heavy rains.",
     "Check landslide-prone areas before travel.",
@@ -11,110 +18,207 @@ class HomePage extends StatelessWidget {
     "Use safe routes during bad weather",
   ];
 
+  bool _isDarkMode = false; 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? user; 
+
+  @override
+  void initState() {
+    super.initState();
+    user = _auth.currentUser; 
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Gradient background
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 58, 223, 201),
-                  Color.fromARGB(255, 124, 204, 224),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+    return MaterialApp(
+      debugShowCheckedModeBanner: false, 
+      theme: _isDarkMode ? ThemeData.dark() : ThemeData.light(),
+      home: Scaffold(
+        backgroundColor: _isDarkMode ? Colors.black87 : Colors.lightGreen[100],
+        appBar: AppBar(
+          title: Text("Landslide Prediction App"),
+          backgroundColor: Colors.green[800],
+          actions: [
+            AnimatedScale(
+              scale: 1.2, 
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              child: IconButton(
+                icon: Icon(Icons.account_circle, size: 30),
+                onPressed: () => _showUserDetails(context),
               ),
             ),
-          ),
 
-          // Content overlay
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 100),
-                Center(
-                  child: Text(
-                    'Welcome to the Landslide Prediction App',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+            if (user != null)
+              AnimatedOpacity(
+                opacity: 1.0,
+                duration: Duration(milliseconds: 500),
+                child: IconButton(
+                  icon: Icon(Icons.logout, color: Colors.white),
+                  onPressed: () async {
+                    await _auth.signOut();
+                    setState(() {
+                      user = null;
+                    });
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()), // Redirect to Login
+                    );
+                  },
                 ),
-                const SizedBox(height: 40),
-                
-                // Buttons
-                _buildButton(context, 'Landslide Prediction', Icons.warning, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PredictionPage()));
-                }),
-                _buildButton(context, 'Guidance', Icons.help, () {
-                  // Replace with actual page
-                }),
-                _buildButton(context, 'Weather Forecasting', Icons.cloud, () {
-                  // Replace with actual page
-                }),
-                _buildButton(context, 'Emergency Alerts', Icons.notifications, () {
-                  // Replace with actual page
-                }),
-                _buildButton(context, 'Resource Requests', Icons.support, () {
-                  // Replace with actual page
-                }),
-                _buildButton(context, 'Contact Us', Icons.feedback, () {
-                  // Replace with actual page
-                }),
-              ],
-            ),
-          ),
-        ],
-      ),
+              ),
+          ],
+        ),
+        body: Column(
+          children: [
+            const SizedBox(height: 10),
 
-      // Flash News Marquee at the Bottom
-      bottomNavigationBar: Container(
-        color: Colors.green,
-        height: 50,
-        child: Marquee(
-          text: newsList.join("  •  "), // Separate news items with a bullet
-          style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255), fontSize: 16, fontWeight: FontWeight.bold),
-          scrollAxis: Axis.horizontal,
-          blankSpace: 50.0,
-          velocity: 50.0,
-          pauseAfterRound: Duration(seconds: 1),
-          startPadding: 10.0,
-          accelerationDuration: Duration(seconds: 1),
-          accelerationCurve: Curves.easeIn,
-          decelerationDuration: Duration(seconds: 1),
-          decelerationCurve: Curves.easeOut,
+            SwitchListTile(
+              title: Text(
+                "Dark Mode",
+                style: TextStyle(color: _isDarkMode ? Colors.white : Colors.black),
+              ),
+              value: _isDarkMode,
+              onChanged: (value) {
+                setState(() {
+                  _isDarkMode = value;
+                });
+              },
+              secondary: Icon(
+                _isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                color: _isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+
+            Container(
+              color: Colors.green,
+              height: 40,
+              child: Marquee(
+                text: newsList.join("  •  "),
+                style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                scrollAxis: Axis.horizontal,
+                blankSpace: 50.0,
+                velocity: 50.0,
+                pauseAfterRound: Duration(seconds: 1),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  children: [
+                    _buildHoverButton(context, 'Landslide Prediction', Icons.warning, PredictionPage()),
+                    _buildHoverButton(context, 'Guidance', Icons.help, GuidancePage()),
+                    _buildHoverButton(context, 'Weather Forecasting', Icons.cloud, WeatherForecastingPage()),
+                    _buildHoverButton(context, 'Emergency Alerts', Icons.notifications, EmergencyAlertsPage()),
+                    _buildHoverButton(context, 'Resource Requests', Icons.support, ResourceRequestsPage()),
+                    _buildHoverButton(context, 'Contact Us', Icons.feedback, FeedbackPage()),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildButton(BuildContext context, String label, IconData icon, VoidCallback onPressed) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 30),
-        label: Text(
-          label,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: Colors.white,
-          foregroundColor: Color.fromARGB(255, 0, 131, 176),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+  void _showUserDetails(BuildContext context) {
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Not Logged In")));
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => FadeTransition(
+        opacity: AlwaysStoppedAnimation(0.8),
+        child: AlertDialog(
+          title: Text("User Details"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: user!.photoURL != null
+                    ? NetworkImage(user!.photoURL!)
+                    : AssetImage("assets/default_user.png") as ImageProvider, 
+              ),
+              SizedBox(height: 10),
+              Text("Name: ${user!.displayName ?? "N/A"}"),
+              Text("Email: ${user!.email}"),
+            ],
           ),
-          elevation: 10,
-          shadowColor: Colors.black26,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Close"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHoverButton(BuildContext context, String label, IconData icon, Widget page) {
+    return MouseRegion(
+      onEnter: (event) => setState(() {}),
+      onExit: (event) => setState(() {}),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+        },
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            color: _isDarkMode ? Colors.grey[900] : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 5,
+                spreadRadius: 1,
+                offset: Offset(2, 2),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TweenAnimationBuilder(
+                tween: Tween<double>(begin: 1.0, end: 1.1),
+                duration: Duration(milliseconds: 300),
+                builder: (context, double scale, child) {
+                  return Transform.scale(
+                    scale: scale,
+                    child: Icon(
+                      icon,
+                      size: 40,
+                      color: _isDarkMode ? Colors.white : Colors.green[700],
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 10),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: _isDarkMode ? Colors.white : Colors.green[900],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -16,7 +16,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_animate/flutter_animate.dart'; // Package for animations
-
+import 'admin_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'home_page.dart';
 import 'login_page.dart';
@@ -45,116 +45,10 @@ class LandslideApp extends StatelessWidget {
         primarySwatch: Colors.green,
         fontFamily: 'Roboto',
       ),
-      home: AuthWrapper(),
+      home: LoginPage(),
     );
   }
 }
-class AuthWrapper extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.active) {
-          return snapshot.hasData ? HomePage() : LoginPage();
-        }
-        return Center(child: CircularProgressIndicator());
-      },
-    );
-  }
-}
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Gradient background
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 58, 223, 201),
-                  Color.fromARGB(255, 124, 204, 224),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-
-          // Content overlay
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 100),
-                Center(
-                  child: Text(
-                    'Welcome to the Landslide Prediction App',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                
-                // Buttons
-                _buildButton(context, 'Landslide Prediction', Icons.warning, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => PredictionPage()));
-                }),
-                _buildButton(context, 'Guidance', Icons.help, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => GuidancePage()));
-                }),
-                _buildButton(context, 'Weather Forecasting', Icons.cloud, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => WeatherForecastingPage()));
-                }),
-                _buildButton(context, 'Emergency Alerts', Icons.notifications, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => EmergencyAlertsPage()));
-                }),
-                _buildButton(context, 'Resource Requests', Icons.support, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ResourceRequestsPage()));
-                }),
-                _buildButton(context, 'Contact Us', Icons.feedback, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => FeedbackPage()));
-                }),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildButton(BuildContext context, String label, IconData icon, VoidCallback onPressed) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 30),
-        label: Text(
-          label,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: Colors.white,
-          foregroundColor: Color.fromARGB(255, 0, 131, 176),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          elevation: 10,
-          shadowColor: Colors.black26,
-        ),
-      ),
-    );
-  }
-}
-
 class GuidancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
